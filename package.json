@@ -40,11 +40,7 @@
     "portable": {
       "artifactName": "BKN-CAT-Windows.exe"
     },
-    "artifactName": "${productName}-${os}-${arch}.${ext}",
-    "publish": {
-      "provider": "github",
-      "releaseType": "release"
-    }
+    "artifactName": "${productName}-${os}-${arch}.${ext}"
   },
   "devDependencies": {
     "electron": "^29.4.6",
