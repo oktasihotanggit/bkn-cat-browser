@@ -6,7 +6,7 @@
   "scripts": {
     "start": "electron .",
     "build:win": "electron-builder --win --x64",
-    "build:mac": "electron-builder --mac --arch=universal",
+    "build:mac": "electron-builder --mac --x64 --arm64",
     "build:all": "electron-builder --win --x64 && electron-builder --mac --arch=universal"
   },
   "build": {
@@ -22,8 +22,8 @@
       "category": "public.app-category.education",
       "icon": "assets/icon.icns",
       "target": [
-        { "target": "dmg", "arch": ["universal"] },
-        { "target": "zip", "arch": ["universal"] }
+        { "target": "dmg", "arch": ["x64", "arm64"] },
+        { "target": "zip", "arch": ["x64", "arm64"] }
       ],
       "hardenedRuntime": false,
       "gatekeeperAssess": false,

@@ -31,9 +31,8 @@ jobs:
         run: npm install
 
       - name: Build macOS Universal DMG
-        run: npm run build:mac
+        run: npx electron-builder --mac --x64 --arm64
         env:
-          # Nonaktifkan notarisasi Apple (tidak perlu Apple Developer account)
           CSC_IDENTITY_AUTO_DISCOVERY: false
 
       - name: Upload macOS artifacts
