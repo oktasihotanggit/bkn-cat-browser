@@ -3,60 +3,73 @@ name: Build & Release ExamBro
 on:
   push:
     tags:
-      - 'v*.*.*'        # Trigger: git tag v1.3.0
-  workflow_dispatch:    # Trigger manual dari GitHub UI
+      - 'v*.*.*'
+  workflow_dispatch:
 
 permissions:
-  contents: write       # Diperlukan untuk membuat GitHub Release
+  contents: write
 
 jobs:
-  # ─────────────────────────────────────────────────────────────────
-  # BUILD macOS — Universal Binary (arm64 + x64)
-  # Harus pakai macos runner karena electron-builder butuh Xcode tools
-  # ─────────────────────────────────────────────────────────────────
-  build-mac:
-    name: Build macOS (Universal)
+  # ── macOS ARM64 (Apple Silicon M1/M2/M3/M4) ──────────────────────────────
+  build-mac-arm64:
+    name: Build macOS ARM64
     runs-on: macos-latest
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '20'
 
       - name: Install dependencies
         run: npm install
 
-      - name: Build macOS Universal DMG
-        run: npx electron-builder --mac --x64 --arm64
+      - name: Build macOS ARM64 DMG
+        run: npx electron-builder --mac dmg --arm64
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: false
 
-      - name: Upload macOS artifacts
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: mac-dist
-          path: |
-            dist/*.dmg
-            dist/*.zip
+          name: mac-arm64
+          path: dist/*arm64*.dmg
           retention-days: 7
 
-  # ─────────────────────────────────────────────────────────────────
-  # BUILD Windows — Portable EXE (x64)
-  # ─────────────────────────────────────────────────────────────────
-  build-win:
-    name: Build Windows (x64 Portable)
-    runs-on: windows-latest
-
+  # ── macOS x64 (Intel) ─────────────────────────────────────────────────────
+  build-mac-x64:
+    name: Build macOS x64 (Intel)
+    runs-on: macos-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build macOS x64 DMG
+        run: npx electron-builder --mac dmg --x64
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: false
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mac-x64
+          path: dist/*x64*.dmg
+          retention-days: 7
+
+  # ── Windows x64 Portable ──────────────────────────────────────────────────
+  build-win:
+    name: Build Windows x64
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
         with:
           node-version: '20'
 
@@ -64,39 +77,41 @@ jobs:
         run: npm install
 
       - name: Build Windows Portable EXE
-        run: npm run build:win
+        run: npx electron-builder --win portable --x64
 
-      - name: Upload Windows artifacts
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: win-dist
+          name: win-x64
           path: dist/*.exe
           retention-days: 7
 
-  # ─────────────────────────────────────────────────────────────────
-  # RELEASE — Buat GitHub Release & upload semua artifact
-  # Hanya jalan jika kedua build sukses
-  # ─────────────────────────────────────────────────────────────────
+  # ── Create GitHub Release ─────────────────────────────────────────────────
   release:
     name: Create GitHub Release
-    needs: [build-mac, build-win]
+    needs: [build-mac-arm64, build-mac-x64, build-win]
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/')
-
     steps:
-      - name: Download macOS artifacts
+      - name: Download mac arm64
         uses: actions/download-artifact@v4
         with:
-          name: mac-dist
+          name: mac-arm64
           path: dist/
 
-      - name: Download Windows artifacts
+      - name: Download mac x64
         uses: actions/download-artifact@v4
         with:
-          name: win-dist
+          name: mac-x64
           path: dist/
 
-      - name: List dist files
+      - name: Download win
+        uses: actions/download-artifact@v4
+        with:
+          name: win-x64
+          path: dist/
+
+      - name: List dist
         run: ls -lh dist/
 
       - name: Create Release
@@ -107,18 +122,20 @@ jobs:
             ## BKN CAT Browser ${{ github.ref_name }}
 
             ### Download
-            | Platform | File | Keterangan |
+            | Platform | File | Untuk |
             |---|---|---|
-            | 🍎 macOS | `BKN CAT-mac-universal.dmg` | Intel + Apple Silicon (M1/M2/M3/M4) |
-            | 🪟 Windows | `BKN-CAT-Windows.exe` | Windows 10/11 64-bit, portable |
+            | 🍎 macOS Apple Silicon | `BKN CAT-mac-arm64.dmg` | M1 / M2 / M3 / **M4** |
+            | 🍎 macOS Intel | `BKN CAT-mac-x64.dmg` | Intel Mac |
+            | 🪟 Windows | `BKN-CAT-Windows.exe` | Windows 10/11 64-bit |
 
             ### Cara Install macOS
-            1. Download `.dmg` → buka → drag **BKN CAT** ke **Applications**
-            2. Klik kanan → **Open** (bypass Gatekeeper pertama kali)
-            3. Login dengan username & password dari guru
+            1. Download DMG sesuai chip Mac Anda
+            2. Buka DMG → drag **BKN CAT** ke **Applications**
+            3. Klik kanan → **Open** → **Open** (bypass Gatekeeper)
+            4. Login dengan username & password dari guru
 
             ### Cara Install Windows
-            1. Download `.exe` → langsung jalankan (portable, tidak perlu install)
+            1. Download `.exe` → langsung jalankan (portable)
             2. Jika Windows Defender muncul → **More info → Run anyway**
           files: dist/*
           draft: false

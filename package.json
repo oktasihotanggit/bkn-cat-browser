@@ -1,13 +1,13 @@
 {
   "name": "bkn-cat-browser",
-  "version": "1.3.0",
+  "version": "1.3.2",
   "description": "Secure exam browser for BKN CAT — SMA Unggul Binakasih Nusantara",
   "main": "src/main.js",
   "scripts": {
     "start": "electron .",
     "build:win": "electron-builder --win --x64",
-    "build:mac": "electron-builder --mac --x64 --arm64",
-    "build:all": "electron-builder --win --x64 && electron-builder --mac --arch=universal"
+    "build:mac-arm64": "electron-builder --mac --arm64",
+    "build:mac-x64": "electron-builder --mac --x64"
   },
   "build": {
     "appId": "com.binakasih.bkn-cat",
@@ -15,19 +15,16 @@
     "copyright": "© 2024 SMA Unggul Binakasih Nusantara",
     "asar": true,
     "files": [
-      "src/**/*",
-      "assets/**/*"
+      "src/**/*"
     ],
     "mac": {
       "category": "public.app-category.education",
-      "icon": "assets/icon.icns",
       "target": [
-        { "target": "dmg", "arch": ["x64", "arm64"] },
-        { "target": "zip", "arch": ["x64", "arm64"] }
+        { "target": "dmg", "arch": ["arm64"] },
+        { "target": "dmg", "arch": ["x64"] }
       ],
       "hardenedRuntime": false,
-      "gatekeeperAssess": false,
-      "entitlementsLoginHelper": null
+      "gatekeeperAssess": false
     },
     "dmg": {
       "title": "BKN CAT Browser",
@@ -35,7 +32,6 @@
       "window": { "width": 540, "height": 380 }
     },
     "win": {
-      "icon": "assets/icon.ico",
       "target": [
         { "target": "portable", "arch": ["x64"] }
       ],
