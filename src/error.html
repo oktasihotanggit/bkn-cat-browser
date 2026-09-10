@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Koneksi Gagal</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #1e3a5f, #0f172a);
+    min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    color: white;
+    user-select: none;
+    -webkit-app-region: no-drag;
+  }
+  .card {
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px;
+    padding: 3rem 2.5rem;
+    max-width: 420px;
+    text-align: center;
+    backdrop-filter: blur(10px);
+  }
+  .icon {
+    font-size: 56px;
+    margin-bottom: 1.25rem;
+  }
+  h2 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: .75rem;
+  }
+  p {
+    font-size: .88rem;
+    color: rgba(255,255,255,0.65);
+    line-height: 1.7;
+    margin-bottom: 2rem;
+  }
+  button {
+    background: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: .75rem 2rem;
+    font-size: .9rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background .2s;
+  }
+  button:hover { background: #2563eb; }
+  .hint {
+    margin-top: 1.5rem;
+    font-size: .75rem;
+    color: rgba(255,255,255,0.3);
+  }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="icon">📡</div>
+  <h2>Tidak Dapat Terhubung</h2>
+  <p>
+    Pastikan laptop terhubung ke internet,<br>
+    lalu klik <strong>Coba Lagi</strong>.
+  </p>
+  <button onclick="window.location.reload()">↺ &nbsp;Coba Lagi</button>
+  <div class="hint">Hubungi pengawas jika masalah berlanjut</div>
+</div>
+</body>
+</html>

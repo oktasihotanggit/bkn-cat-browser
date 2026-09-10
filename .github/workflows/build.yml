@@ -1,0 +1,128 @@
+name: Build & Release ExamBro
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'        # Trigger: git tag v1.3.0
+  workflow_dispatch:    # Trigger manual dari GitHub UI
+
+permissions:
+  contents: write       # Diperlukan untuk membuat GitHub Release
+
+jobs:
+  # ─────────────────────────────────────────────────────────────────
+  # BUILD macOS — Universal Binary (arm64 + x64)
+  # Harus pakai macos runner karena electron-builder butuh Xcode tools
+  # ─────────────────────────────────────────────────────────────────
+  build-mac:
+    name: Build macOS (Universal)
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build macOS Universal DMG
+        run: npm run build:mac
+        env:
+          # Nonaktifkan notarisasi Apple (tidak perlu Apple Developer account)
+          CSC_IDENTITY_AUTO_DISCOVERY: false
+
+      - name: Upload macOS artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: mac-dist
+          path: |
+            dist/*.dmg
+            dist/*.zip
+          retention-days: 7
+
+  # ─────────────────────────────────────────────────────────────────
+  # BUILD Windows — Portable EXE (x64)
+  # ─────────────────────────────────────────────────────────────────
+  build-win:
+    name: Build Windows (x64 Portable)
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Windows Portable EXE
+        run: npm run build:win
+
+      - name: Upload Windows artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: win-dist
+          path: dist/*.exe
+          retention-days: 7
+
+  # ─────────────────────────────────────────────────────────────────
+  # RELEASE — Buat GitHub Release & upload semua artifact
+  # Hanya jalan jika kedua build sukses
+  # ─────────────────────────────────────────────────────────────────
+  release:
+    name: Create GitHub Release
+    needs: [build-mac, build-win]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+
+    steps:
+      - name: Download macOS artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: mac-dist
+          path: dist/
+
+      - name: Download Windows artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: win-dist
+          path: dist/
+
+      - name: List dist files
+        run: ls -lh dist/
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "BKN CAT ${{ github.ref_name }}"
+          body: |
+            ## BKN CAT Browser ${{ github.ref_name }}
+
+            ### Download
+            | Platform | File | Keterangan |
+            |---|---|---|
+            | 🍎 macOS | `BKN CAT-mac-universal.dmg` | Intel + Apple Silicon (M1/M2/M3/M4) |
+            | 🪟 Windows | `BKN-CAT-Windows.exe` | Windows 10/11 64-bit, portable |
+
+            ### Cara Install macOS
+            1. Download `.dmg` → buka → drag **BKN CAT** ke **Applications**
+            2. Klik kanan → **Open** (bypass Gatekeeper pertama kali)
+            3. Login dengan username & password dari guru
+
+            ### Cara Install Windows
+            1. Download `.exe` → langsung jalankan (portable, tidak perlu install)
+            2. Jika Windows Defender muncul → **More info → Run anyway**
+          files: dist/*
+          draft: false
+          prerelease: false

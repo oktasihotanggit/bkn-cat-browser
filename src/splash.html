@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BKN CAT</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    width: 480px;
+    height: 320px;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    -webkit-app-region: drag;
+    user-select: none;
+  }
+
+  .card {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(145deg, #1e3a5f 0%, #2d6a9f 60%, #1a2f4e 100%);
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* Lingkaran dekorasi */
+  .card::before {
+    content: '';
+    position: absolute;
+    width: 300px; height: 300px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.04);
+    top: -80px; right: -60px;
+  }
+  .card::after {
+    content: '';
+    position: absolute;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.03);
+    bottom: -50px; left: -40px;
+  }
+
+  .logo-wrap {
+    width: 88px; height: 88px;
+    background: rgba(255,255,255,0.12);
+    border-radius: 22px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 20px;
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255,255,255,0.15);
+  }
+
+  .logo-wrap svg {
+    width: 52px; height: 52px;
+    fill: white;
+    opacity: 0.95;
+  }
+
+  h1 {
+    font-family: -apple-system, 'Segoe UI', sans-serif;
+    font-size: 26px;
+    font-weight: 800;
+    color: white;
+    letter-spacing: -0.5px;
+    margin-bottom: 6px;
+  }
+
+  .sub {
+    font-family: -apple-system, 'Segoe UI', sans-serif;
+    font-size: 12px;
+    color: rgba(255,255,255,0.6);
+    letter-spacing: 0.3px;
+    margin-bottom: 36px;
+  }
+
+  /* Progress bar */
+  .progress-wrap {
+    width: 200px;
+    height: 3px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+
+  .progress-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #60a5fa, #a5f3fc);
+    border-radius: 99px;
+    animation: load 2s ease-in-out forwards;
+  }
+
+  @keyframes load {
+    0%   { width: 0%; }
+    30%  { width: 45%; }
+    70%  { width: 75%; }
+    90%  { width: 92%; }
+    100% { width: 100%; }
+  }
+
+  .version {
+    position: absolute;
+    bottom: 18px;
+    font-family: -apple-system, 'Segoe UI', sans-serif;
+    font-size: 10px;
+    color: rgba(255,255,255,0.3);
+  }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo-wrap">
+    <!-- Shield icon -->
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-1 14l-3-3 1.41-1.41L11 12.17l4.59-4.58L17 9l-6 6z"/>
+    </svg>
+  </div>
+
+  <h1>BKN CAT</h1>
+  <div class="sub">Browser Ujian Aman — Binakasih Nusantara</div>
+
+  <div class="progress-wrap">
+    <div class="progress-bar"></div>
+  </div>
+
+  <div class="version">v1.3.0</div>
+</div>
+</body>
+</html>
